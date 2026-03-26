@@ -47,15 +47,16 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Returns true if the car was successfully removed, false otherwise.
     /// </summary>
     /// <param name="id">The Id of the car to remove.</param>
+    /// <param name="userId">The Id of the user who owns the car to remove.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>True if the car was successfully removed, false otherwise.</returns>
-    public async Task<bool> RemoveAsync(int id, CancellationToken ct = default)
+    public async Task<bool> RemoveAsync(int id, int userId, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
         var command = new CommandDefinition(
-            "DELETE FROM Cars WHERE Id = @Id;",
-            new { Id = id },
+            "DELETE FROM Cars WHERE Id = @Id AND UserId = @UserId;",
+            new { Id = id, UserId = userId },
             cancellationToken: ct
         );
 
