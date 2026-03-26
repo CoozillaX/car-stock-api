@@ -63,6 +63,25 @@ public class UserRepository(DbConnectionFactory dbConnectionFactory)
     }
 
     /// <summary>
+    /// Retrieves a user from the database by its Id. Returns null if no user with the given Id exists.
+    /// </summary>
+    /// <param name="id">The Id of the user to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The user with the specified Id, or null if not found.</returns>
+    public async Task<User?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        var command = new CommandDefinition(
+            "SELECT * FROM Users WHERE Id = @Id;",
+            new { Id = id },
+            cancellationToken: ct
+        );
+
+        return await connection.QueryFirstOrDefaultAsync<User>(command);
+    }
+
+    /// <summary>
     /// Retrieves a user from the database that matches the given username.
     /// Since usernames are unique, this will return either a single user or null.
     /// </summary>
