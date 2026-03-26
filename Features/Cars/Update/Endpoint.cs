@@ -38,23 +38,30 @@ public class UpdateCarsEndpoint(UserRepository userRepo, CarRepository carRepo)
     {
         var user = await GetUserAsync(ct);
 
-        // Permission check is handled in the repository layer
-        var success = await carRepo.UpdateAsync(
-            id: req.Id,
-            userId: user.Id,
-            make: req.Make,
-            model: req.Model,
-            year: req.Year,
-            stock: req.Stock,
-            ct: ct
-        );
-
-        if (!success)
+        try
         {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
+            // Permission check is handled in the repository layer
+            var success = await carRepo.UpdateAsync(
+                id: req.Id,
+                userId: user.Id,
+                make: req.Make,
+                model: req.Model,
+                year: req.Year,
+                stock: req.Stock,
+                ct: ct
+            );
 
-        await Send.NoContentAsync(ct);
+            if (success)
+            {
+                await Send.NoContentAsync(ct);
+                return;
+            }
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 19)
+        {
+            ThrowError("A car with the same make, model and year already exists.", 400);
+        }
+        
+        await Send.NotFoundAsync(ct);
     }
 }
