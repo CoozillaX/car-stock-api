@@ -28,7 +28,6 @@ public class AddCarsEndpoint(UserRepository userRepo, CarRepository carRepo)
         Description(s =>
         {
             s.Produces<CarDto>(200, "application/json");
-            s.Produces(400);
         });
     }
 
