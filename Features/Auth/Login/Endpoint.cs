@@ -14,15 +14,32 @@ public class LoginEndpoint(UserRepository repo, IConfiguration config) : Endpoin
     private readonly string _key =
         config["Jwt:SigningKey"] ??
         throw new InvalidOperationException("JWT signing key is not configured.");
-        
+    
+    /// <summary>
+    /// Configures the endpoint route.
+    /// </summary>
     public override void Configure()
     {
         Post("/auth/login");
         RoutePrefixOverride("");
 
         AllowAnonymous();
+
+        Summary(s =>
+        {
+            s.Summary = "Authenticate user and return JWT token";
+            s.Description = "Validates username and password, then returns a JWT token for authenticated requests.";
+        });
+        Description(s =>
+        {
+            s.Produces<LoginResponse>(200, "application/json");
+            s.Produces(401);
+        });
     }
 
+    /// <summary>
+    /// Handles the incoming request.
+    /// </summary>
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
     {
         // Get the user by username

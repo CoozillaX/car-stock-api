@@ -8,6 +8,9 @@ namespace car_stock_api.Infrastructure.Database;
 /// <param name="factory">The factory for creating database connections, used to execute the SQL commands for seeding data.</param>
 public class DbSeeder(DbConnectionFactory factory)
 {
+    /// <summary>
+    /// Seeds the database with initial data if the Users table is empty. It inserts sample users and cars into the database to provide initial data for testing and development purposes.
+    /// </summary>
     public async Task SeedAsync()
     {
         using var connection = factory.CreateConnection();

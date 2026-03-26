@@ -12,11 +12,27 @@ namespace car_stock_api.Features.Cars.Search;
 public class SearchCarsEndpoint(UserRepository userRepo, CarRepository carRepo)
     : AuthenticatedEndpoint<SearchCarRequest, IEnumerable<CarDto>>(userRepo)
 {
+    /// <summary>
+    /// Configures the endpoint route.
+    /// </summary>
     public override void Configure()
     {
         Get("/cars");
+
+        Summary(s =>
+        {
+            s.Summary = "Search cars in the inventory";
+            s.Description = "Searches for cars in the authenticated user's inventory based on optional make and model filters. If no filters are provided, returns all cars in the inventory.";
+        });
+        Description(s =>
+        {
+            s.Produces<IEnumerable<CarDto>>(200, "application/json");
+        });
     }
 
+    /// <summary>
+    /// Handles the incoming request.
+    /// </summary>
     public override async Task HandleAsync(SearchCarRequest req, CancellationToken ct)
     {
         var user = await GetUserAsync(ct);

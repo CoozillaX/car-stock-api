@@ -12,6 +12,10 @@ public class DBInitialiser(DbConnectionFactory dbConnectionFactory)
 {
     private readonly DbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
 
+    /// <summary>
+    /// Initializes the database by creating the Users and Cars tables if they do not already exist.
+    /// The Users table is created first since the Cars table has a foreign key reference to it.
+    /// </summary>
     public async Task InitialiseAsync()
     {
         using var connection = _dbConnectionFactory.CreateConnection();

@@ -1,5 +1,6 @@
 using FastEndpoints;
 using FastEndpoints.Security;
+using FastEndpoints.Swagger;
 using car_stock_api.Infrastructure.Database;
 using car_stock_api.Infrastructure.Repositories;
 
@@ -15,6 +16,10 @@ bld.Services
     .AddAuthenticationJwtBearer(s =>
     {
         s.SigningKey = bld.Configuration["Jwt:SigningKey"];
+    })
+    .SwaggerDocument(o =>
+    {
+        o.EnableJWTBearerAuth = true;
     });
 
 var app = bld.Build();
@@ -37,6 +42,7 @@ app
     .UseFastEndpoints(c =>
     {
         c.Endpoints.RoutePrefix = "api";
-    });
+    })
+    .UseSwaggerGen();
 
 app.Run();

@@ -13,11 +13,28 @@ namespace car_stock_api.Features.Cars.Add;
 public class AddCarsEndpoint(UserRepository userRepo, CarRepository carRepo)
     : AuthenticatedEndpoint<AddCarRequest, CarDto>(userRepo)
 {
+    /// <summary>
+    /// Configures the endpoint route.
+    /// </summary>
     public override void Configure()
     {
         Post("/cars");
+
+        Summary(s =>
+        {
+            s.Summary = "Add a new car to the inventory";
+            s.Description = "Adds a new car to the authenticated user's inventory. The request must include the make, model, year, and stock quantity of the car.";
+        });
+        Description(s =>
+        {
+            s.Produces<CarDto>(200, "application/json");
+            s.Produces(400);
+        });
     }
 
+    /// <summary>
+    /// Handles the incoming request.
+    /// </summary>
     public override async Task HandleAsync(AddCarRequest req, CancellationToken ct)
     {
         var user = await GetUserAsync(ct);
