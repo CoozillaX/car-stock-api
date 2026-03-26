@@ -5,7 +5,7 @@ authentication ensures each dealer can only access their own data.\
 The API uses **FastEndpoints**, **Dapper**, and a local **SQLite**
 database, and includes **Swagger** for easy testing.
 
-------------------------------------------------------------------------
+---
 
 ## Tech Stack
 
@@ -15,14 +15,14 @@ database, and includes **Swagger** for easy testing.
 - SQLite
 - JWT Authentication
 
-------------------------------------------------------------------------
+---
 
 ## Requirements
 
 - .NET SDK 10.0 (or compatible preview version)
 - No external database required (uses SQLite locally)
 
-------------------------------------------------------------------------
+---
 
 ## How to Run
 
@@ -34,7 +34,7 @@ dotnet run
 
 The SQLite database will be created automatically.
 
-------------------------------------------------------------------------
+---
 
 ### 2. (Optional) Seed Demo Users
 
@@ -60,7 +60,7 @@ This creates:
 | user2    | password |
 | user3    | password |
 
-------------------------------------------------------------------------
+---
 
 ### 3. Open Swagger
 
@@ -68,7 +68,7 @@ This creates:
 
 Use Swagger to test all endpoints.
 
-------------------------------------------------------------------------
+---
 
 ### 4. Login
 
@@ -85,7 +85,7 @@ Example:
 
 Copy the returned token.
 
-------------------------------------------------------------------------
+---
 
 ### 5. Authorize
 
@@ -93,13 +93,13 @@ Click **Authorize** in Swagger and enter:
 
     Bearer {token}
 
-------------------------------------------------------------------------
+---
 
 ## Endpoints
 
-- `GET /api/cars` --- List or search cars\
-- `POST /api/cars` --- Add car\
-- `PATCH /api/cars/{id}` --- Update car\
+- `GET /api/cars` --- List or search cars
+- `POST /api/cars` --- Add car
+- `PATCH /api/cars/{id}` --- Update car
 - `DELETE /api/cars/{id}` --- Remove car
 
 ### Search Example
