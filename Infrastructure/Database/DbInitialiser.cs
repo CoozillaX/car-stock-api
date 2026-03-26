@@ -1,4 +1,5 @@
 using Dapper;
+
 namespace car_stock_api.Infrastructure.Database;
 
 /// <summary>
@@ -16,16 +17,16 @@ public class DBInitialiser(DbConnectionFactory dbConnectionFactory)
         using var connection = _dbConnectionFactory.CreateConnection();
 
         // Create Users table first, since Cars has a foreign key reference to it
-        await connection.ExecuteAsync(@"
+        await connection.ExecuteAsync("""
             CREATE TABLE IF NOT EXISTS Users (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT NOT NULL UNIQUE,
                 PasswordHash TEXT NOT NULL
             );
-        ");
+        """);
 
         // Create Cars table
-        await connection.ExecuteAsync(@"
+        await connection.ExecuteAsync("""
             CREATE TABLE IF NOT EXISTS Cars (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 UserId INTEGER NOT NULL,
@@ -36,6 +37,6 @@ public class DBInitialiser(DbConnectionFactory dbConnectionFactory)
                 UNIQUE (UserId, Make, Model, Year),
                 FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
             );
-        ");
+        """);
     }
 }
