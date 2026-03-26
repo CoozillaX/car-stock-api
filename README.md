@@ -5,6 +5,8 @@ authentication ensures each dealer can only access their own data.\
 The API uses **FastEndpoints**, **Dapper**, and a local **SQLite**
 database, and includes **Swagger** for easy testing.
 
+For ease of testing, the SQLite connection string and a demo JWT signing key are included in `appsettings*.json` and committed to the repository. These values are intended for development/testing only.
+
 ---
 
 ## Tech Stack
