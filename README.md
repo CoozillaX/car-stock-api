@@ -89,9 +89,7 @@ Copy the returned token.
 
 ### 5. Authorize
 
-Click **Authorize** in Swagger and enter:
-
-    Bearer {token}
+Click **Authorize** in Swagger and enter your token
 
 ---
 
