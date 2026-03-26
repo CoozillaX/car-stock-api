@@ -18,21 +18,26 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Creates a new car in the database and returns the created car with its assigned Id.
     /// </summary>
     /// <param name="car">The car to create.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>The created car with Id.</returns>
     /// <exception cref="Microsoft.Data.Sqlite.SqliteException">
     /// Thrown when a car with the same UserId, Make, Model and Year already exists.
     /// </exception>
-    public async Task<Car> CreateAsync(Car car)
+    public async Task<Car> CreateAsync(Car car, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        var id = await connection.ExecuteScalarAsync<int>(
-            @"
+
+        var command = new CommandDefinition(
+            """
             INSERT INTO Cars (UserId, Make, Model, Year, Stock) 
             VALUES (@UserId, @Make, @Model, @Year, @Stock);
             SELECT last_insert_rowid();
-            ",
-            car
+            """,
+            car,
+            cancellationToken: ct
         );
+        
+        var id = await connection.ExecuteScalarAsync<int>(command);
         car.Id = id;
         return car;
     }
@@ -42,14 +47,19 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Returns true if the car was successfully removed, false otherwise.
     /// </summary>
     /// <param name="id">The Id of the car to remove.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>True if the car was successfully removed, false otherwise.</returns>
-    public async Task<bool> RemoveAsync(int id)
+    public async Task<bool> RemoveAsync(int id, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        var rows = await connection.ExecuteAsync(
-            @"DELETE FROM Cars WHERE Id = @Id;",
-            new { Id = id }
+
+        var command = new CommandDefinition(
+            "DELETE FROM Cars WHERE Id = @Id;",
+            new { Id = id },
+            cancellationToken: ct
         );
+
+        var rows = await connection.ExecuteAsync(command);
         return rows > 0;
     }
 
@@ -58,18 +68,23 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Returns true if the car was successfully updated, false otherwise.
     /// </summary>
     /// <param name="car">The car to update.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>True if the car was successfully updated, false otherwise.</returns>
-    public async Task<bool> UpdateAsync(Car car)
+    public async Task<bool> UpdateAsync(Car car, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        var rows = await connection.ExecuteAsync(
-            @"
+
+        var command = new CommandDefinition(
+            """
             UPDATE Cars 
             SET UserId = @UserId, Make = @Make, Model = @Model, Year = @Year, Stock = @Stock
             WHERE Id = @Id;
-            ",
-            car
+            """,
+            car,
+            cancellationToken: ct
         );
+
+        var rows = await connection.ExecuteAsync(command);
         return rows > 0;
     }
 
@@ -77,28 +92,38 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Retrieves a car from the database by its Id. Returns null if no car with the given Id exists.
     /// </summary>
     /// <param name="id">The Id of the car to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>The car with the specified Id, or null if not found.</returns>
-    public async Task<Car?> GetByIdAsync(int id)
+    public async Task<Car?> GetByIdAsync(int id, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        return await connection.QuerySingleOrDefaultAsync<Car>(
-            @"SELECT * FROM Cars WHERE Id = @Id;",
-            new { Id = id }
+
+        var command = new CommandDefinition(
+            "SELECT * FROM Cars WHERE Id = @Id;",
+            new { Id = id },
+            cancellationToken: ct
         );
+
+        return await connection.QuerySingleOrDefaultAsync<Car>(command);
     }
 
     /// <summary>
     /// Retrieves all cars from the database that belong to a specific user, identified by their UserId.
     /// </summary>
     /// <param name="userId">The Id of the user whose cars to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>The collection of cars belonging to the specified user.</returns>
-    public async Task<IEnumerable<Car>> GetByUserIdAsync(int userId)
+    public async Task<IEnumerable<Car>> GetByUserIdAsync(int userId, CancellationToken ct = default)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        return await connection.QueryAsync<Car>(
-            @"SELECT * FROM Cars WHERE UserId = @UserId;",
-            new { UserId = userId }
+
+        var command = new CommandDefinition(
+            "SELECT * FROM Cars WHERE UserId = @UserId;",
+            new { UserId = userId },
+            cancellationToken: ct
         );
+
+        return await connection.QueryAsync<Car>(command);
     }
 
     /// <summary>
@@ -107,16 +132,26 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// <param name="userId">The Id of the user whose cars to search.</param>
     /// <param name="make">The make of the cars to search for.</param>
     /// <param name="model">The model of the cars to search for.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>The collection of cars matching the make and model for the specified user.</returns>
-    public async Task<IEnumerable<Car>> GetByMakeModelAsync(int userId, string make, string model)
+    public async Task<IEnumerable<Car>> GetByMakeModelAsync(
+        int userId,
+        string make,
+        string model,
+        CancellationToken ct = default
+    )
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        return await connection.QueryAsync<Car>(
-            @"
+
+        var command = new CommandDefinition(
+            """
             SELECT * FROM Cars 
             WHERE UserId = @UserId AND Make = @Make AND Model = @Model;
-            ",
-            new { UserId = userId, Make = make, Model = model }
+            """,
+            new { UserId = userId, Make = make, Model = model },
+            cancellationToken: ct
         );
+
+        return await connection.QueryAsync<Car>(command);
     }
 }

@@ -26,7 +26,7 @@ public class LoginEndpoint(UserRepository repo, IConfiguration config) : Endpoin
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
     {
         // Get the user by username
-        var user = await repo.GetByUsernameAsync(req.Username);
+        var user = await repo.GetByUsernameAsync(req.Username, ct);
 
         // If the user doesn't exist or the password is incorrect, return 401 Unauthorized
         if (user is null || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
