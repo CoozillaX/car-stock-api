@@ -21,15 +21,8 @@ public class DeleteCarsEndpoint(UserRepository userRepo, CarRepository carRepo)
     {
         var user = await GetUserAsync(ct);
 
-        var car = await carRepo.GetByIdAsync(req.Id, ct);
-
-        if (car is null || car.UserId != user.Id)
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
-        var success = await carRepo.RemoveAsync(car.Id, user.Id, ct);
+        // Permission check is handled in the repository layer
+        var success = await carRepo.RemoveAsync(req.Id, user.Id, ct);
         if (!success)
         {
             await Send.NotFoundAsync(ct);

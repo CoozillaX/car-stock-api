@@ -36,7 +36,7 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
             car,
             cancellationToken: ct
         );
-        
+
         var id = await connection.ExecuteScalarAsync<int>(command);
         car.Id = id;
         return car;
@@ -68,20 +68,35 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// Updates an existing car in the database.
     /// Returns true if the car was successfully updated, false otherwise.
     /// </summary>
-    /// <param name="car">The car to update.</param>
+    /// <param name="id">The Id of the car to update.</param>
+    /// <param name="userId">The Id of the user who owns the car to update.</param>
+    /// <param name="make">The new make of the car, or null to keep the existing make.</param>
+    /// <param name="model">The new model of the car, or null to keep the existing model.</param>
+    /// <param name="year">The new year of the car, or null to keep the existing year.</param>
+    /// <param name="stock">The new stock of the car, or null to keep the existing stock.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>True if the car was successfully updated, false otherwise.</returns>
-    public async Task<bool> UpdateAsync(Car car, CancellationToken ct = default)
+    public async Task<bool> UpdateAsync(
+        int id,
+        int userId,
+        string? make,
+        string? model,
+        int? year,
+        int? stock,
+        CancellationToken ct)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
         var command = new CommandDefinition(
             """
             UPDATE Cars 
-            SET UserId = @UserId, Make = @Make, Model = @Model, Year = @Year, Stock = @Stock
-            WHERE Id = @Id;
+            SET Make = COALESCE(@Make, Make), 
+                Model = COALESCE(@Model, Model), 
+                Year = COALESCE(@Year, Year), 
+                Stock = COALESCE(@Stock, Stock)
+            WHERE Id = @Id AND UserId = @UserId;
             """,
-            car,
+            new { Id = id, UserId = userId, Make = make, Model = model, Year = year, Stock = stock },
             cancellationToken: ct
         );
 
