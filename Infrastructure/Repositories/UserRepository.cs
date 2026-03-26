@@ -51,15 +51,15 @@ public class UserRepository(DbConnectionFactory dbConnectionFactory)
     }
 
     /// <summary>
-    /// Retrieves users from the database that match the given username.
-    /// Since usernames are unique, this will return either an empty collection or a collection with a single user.
+    /// Retrieves a user from the database that matches the given username.
+    /// Since usernames are unique, this will return either a single user or null.
     /// </summary>
     /// <param name="username">The username to search for.</param>
-    /// <returns>The collection of users matching the username.</returns>
-    public async Task<IEnumerable<User>> GetByUsernameAsync(string username)
+    /// <returns>A user that matches the given username, or null if no such user exists.</returns>
+    public async Task<User?> GetByUsernameAsync(string username)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
-        return await connection.QueryAsync<User>(
+        return await connection.QueryFirstOrDefaultAsync<User>(
             @"SELECT * FROM Users WHERE Username = @Username;",
             new { Username = username }
         );

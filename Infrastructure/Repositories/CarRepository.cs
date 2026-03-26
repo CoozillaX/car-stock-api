@@ -19,6 +19,9 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     /// </summary>
     /// <param name="car">The car to create.</param>
     /// <returns>The created car with Id.</returns>
+    /// <exception cref="Microsoft.Data.Sqlite.SqliteException">
+    /// Thrown when a car with the same UserId, Make, Model and Year already exists.
+    /// </exception>
     public async Task<Car> CreateAsync(Car car)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
