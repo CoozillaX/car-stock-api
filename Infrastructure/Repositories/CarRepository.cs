@@ -124,36 +124,17 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
     }
 
     /// <summary>
-    /// Retrieves all cars from the database that belong to a specific user, identified by their UserId.
-    /// </summary>
-    /// <param name="userId">The Id of the user whose cars to retrieve.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>The collection of cars belonging to the specified user.</returns>
-    public async Task<IEnumerable<Car>> GetByUserIdAsync(int userId, CancellationToken ct = default)
-    {
-        using var connection = _dbConnectionFactory.CreateConnection();
-
-        var command = new CommandDefinition(
-            "SELECT * FROM Cars WHERE UserId = @UserId;",
-            new { UserId = userId },
-            cancellationToken: ct
-        );
-
-        return await connection.QueryAsync<Car>(command);
-    }
-
-    /// <summary>
     /// Retrieves cars from the database that match the given make and model for a specific user.
     /// </summary>
     /// <param name="userId">The Id of the user whose cars to search.</param>
-    /// <param name="make">The make of the cars to search for.</param>
-    /// <param name="model">The model of the cars to search for.</param>
+    /// <param name="make">The make of the cars to search for, or null to ignore the make filter.</param>
+    /// <param name="model">The model of the cars to search for, or null to ignore the model filter.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The collection of cars matching the make and model for the specified user.</returns>
     public async Task<IEnumerable<Car>> GetByMakeModelAsync(
         int userId,
-        string make,
-        string model,
+        string? make,
+        string? model,
         CancellationToken ct = default
     )
     {
@@ -162,7 +143,9 @@ public class CarRepository(DbConnectionFactory dbConnectionFactory)
         var command = new CommandDefinition(
             """
             SELECT * FROM Cars 
-            WHERE UserId = @UserId AND Make = @Make AND Model = @Model;
+            WHERE UserId = @UserId 
+                AND (@Make IS NULL OR Make = '' OR Make = @Make)
+                AND (@Model IS NULL OR Model = '' OR Model = @Model);
             """,
             new { UserId = userId, Make = make, Model = model },
             cancellationToken: ct
