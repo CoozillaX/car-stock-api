@@ -28,7 +28,7 @@ For ease of testing, the SQLite connection string and a demo JWT signing key are
 ### 1. Start the API
 
 ``` bash
-dotnet run
+dotnet run --project CarStockAPI
 ```
 
 The SQLite database will be created automatically.
@@ -102,3 +102,13 @@ Click **Authorize** in Swagger and enter your token
 ### Search Example
 
     GET /api/cars?make=Toyota&model=Camry
+
+---
+
+## Testing
+
+Seed the database with demo users, then run:
+
+``` bash
+dotnet test
+```
